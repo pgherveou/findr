@@ -4,12 +4,13 @@ events = require 'events'
 
 exports.walk = walk = (dir, filter, fn) ->
 
-  # just to be safe
   dir = path.resolve dir
 
   if arguments.length is 2
     fn = filter
     filter = -> true
+
+  filter = -> true unless typeof filter is 'function'
 
   fn.files ?= {}
   try fn.files[dir] = fs.statSync(dir) catch err then fn err
@@ -60,7 +61,7 @@ exports.watch = watch = (dir, filter, fn) ->
 
 class exports.Monitor extends events.EventEmitter
 
-  constructor: (@name, @dir, @filter = -> true) ->
+  constructor: (@name, @dir, @filter) ->
     @state = 'stopped'
     @files = {}
 
