@@ -1,0 +1,23 @@
+{
+  "name": "findr",
+  "version": "0.0.1",
+  "description": "monitor a directory",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:pgherveou/findr.git"
+  },
+  "keywords": [
+    "watch",
+    "file",
+    "monitor"
+  ],
+ "scripts": {
+    "prepublish": "make build"
+  },
+  "author": "PG Herveou",
+  "license": "BSD"
+}
