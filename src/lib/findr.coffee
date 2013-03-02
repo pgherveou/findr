@@ -70,7 +70,6 @@ class exports.Monitor extends events.EventEmitter
     @state = 'running'
     watch @dir, @filter, (f, curr, prev) =>
       if curr is null and prev is null
-        console.log "file: ", f
         Object.keys(f).forEach (k,v) => @files[k] = v
         @emit 'started', @files
       else if prev is null
