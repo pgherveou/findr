@@ -2,15 +2,17 @@ fs     = require 'fs'
 path   = require 'path'
 events = require 'events'
 
+noFilter = -> true
+
 exports.walk = walk = (dir, filter, fn) ->
 
   dir = path.resolve dir
 
   if arguments.length is 2
     fn = filter
-    filter = -> true
+    filter = noFilter
 
-  filter = -> true unless typeof filter is 'function'
+  filter = noFilter unless typeof filter is 'function'
 
   fn.files ?= {}
   try fn.files[dir] = fs.statSync(dir) catch err then fn err
