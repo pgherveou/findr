@@ -1,6 +1,6 @@
 {
   "name": "findr",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "monitor a directory",
   "main": "index.js",
   "scripts": {

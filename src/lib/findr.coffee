@@ -14,7 +14,7 @@ exports.walk = walk = (dir, filter, fn) ->
 
   filter = noFilter unless typeof filter is 'function'
 
-  fn.files ?= {}
+  fn.files or= {}
   try fn.files[dir] = fs.statSync(dir) catch err then fn err
 
   traverse = (dir) ->
@@ -39,24 +39,24 @@ exports.watch = watch = (dir, filter, fn) ->
         return if files[f] and files[f].isFile() and curr.nlink isnt 0 and curr.mtime.getTime() is prev.mtime.getTime()
         files[f] = curr
 
-        if files[f].isFile() then fn f, curr, prev
-
-        else if curr.nlink isnt 0
-          fs.readdir f, (err, dirFiles) ->
-            return console.error "err loading #{f} : #{err}" if err
-            dirFiles.forEach (filename) ->
-              file = path.join f, filename
-              unless files[file]
-                fs.stat file, (err, stat) ->
-                  return console.error "err loading #{file} : #{err}" if err
-                  if filter file, stat
-                    fn file, stat, null
-                    files[file] = stat
-                    watcher file
+        return fn(f, curr, prev) if files[f].isFile()
 
         if curr.nlink is 0
           delete files[f]
           fs.unwatchFile f
+          return fn(f, curr, prev)
+
+        fs.readdir f, (err, dirFiles) ->
+          return console.error "err loading #{f} : #{err}" if err
+          dirFiles.forEach (filename) ->
+            file = path.join f, filename
+            unless files[file]
+              fs.stat file, (err, stat) ->
+                return console.error "err loading #{file} : #{err}" if err
+                if filter file, stat
+                  fn file, stat, null
+                  files[file] = stat
+                  watcher file
 
     watcher file for file of files
     fn files, null, null
@@ -72,8 +72,7 @@ class exports.Monitor extends events.EventEmitter
     @state = 'running'
     watch @dir, @filter, (f, curr, prev) =>
       if curr is null and prev is null
-        Object.keys(f).forEach (k,v) => @files[k] = v
-        @emit 'started', @files
+        @emit 'started', @files = f
       else if prev is null
         @emit 'created', f, curr, prev
       else if curr.nlink is 0
